@@ -1,3 +1,5 @@
-import { TaskArray } from "../interfaces/interfaces";
+import { PrismaClient } from "@prisma/client";
 
-export const tasksDatabase: TaskArray = [];
+export const prisma = new PrismaClient({
+    log: ["query", "info", "warn", "error"],
+});
