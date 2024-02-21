@@ -1,30 +1,23 @@
-import { TaskController } from "../services/services";
+import { TaskController } from "../services/TaskServices";
+import { CategoryController } from "../services/CategoryServices";
 import { Router } from "express";
 import { CheckTaskExistence, CheckDuplicateTaskName, GlobalErrors } from "../middlewares/middleware";
-import { taskSchema, taskCreateSchema, taskUpdateSchema } from "../schemas/task.schemas";
+import { taskCreateSchema, taskUpdateSchema, categoryCreateSchema } from "../schemas/task.schemas";
 
 const router = Router();
 const globalErrors = new GlobalErrors();
-const validateBody = globalErrors.validateBody(taskSchema)
-
-router.use("/tasks", CheckDuplicateTaskName.getInstance().execute);
-
-router.use("/tasks/:id", CheckTaskExistence.getInstance().execute);
+const taskController = new TaskController();
+const categoryController = new CategoryController();
 
 
 
-router.post("/tasks", validateBody ,globalErrors.validateBody(taskCreateSchema), TaskController.createTask);
+router.post("/tasks", CheckDuplicateTaskName.getInstance().execute, globalErrors.validateBody(taskCreateSchema), taskController.createTask);
+router.get('/tasks', taskController.getTasks);
+router.get("/tasks/:id", taskController.getTaskById);
+router.patch("/tasks/:id",globalErrors.validateBody(taskUpdateSchema), taskController.updateTask);
+router.delete("/tasks/:id", taskController.deleteTask);
 
-router.post("/categories", globalErrors.validateBody(taskCreateSchema), TaskController.createTask);
-
-router.get('/tasks', TaskController.getTasks);
-
-router.get("/tasks/:id", TaskController.getTaskById);
-
-router.patch("/tasks/:id",globalErrors.validateBody(taskUpdateSchema), TaskController.updateTask);
-
-router.delete("/tasks/:id", TaskController.deleteTask);
-
-router.delete("/categories/:id", TaskController.deleteTask);
+router.post("/categories", globalErrors.validateBody(categoryCreateSchema), categoryController.createCategory);
+router.delete("/categories/:id", categoryController.deleteCategory);
 
 export default router;
