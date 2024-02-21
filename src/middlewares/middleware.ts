@@ -32,6 +32,16 @@ export class GlobalErrors {
     return res.status(500).json({ error: "Internal server error" });
   };
 
+  validateTitle(req: Request, res: Response, next: NextFunction) {
+  const { title } = req.body;
+
+  if (typeof title === 'number') {
+    return res.status(400).json({ error: 'Title cannot be a number' });
+  }
+
+  next();
+}
+
   validateBody = (schema: AnyZodObject) => {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -66,8 +76,17 @@ export class GlobalErrors {
 }
 
 export class CheckDuplicateTaskName extends Service {
-  async execute( req: Request, res: Response, next: NextFunction ): Promise<void | Response<any, Record<string, any>>> {
+  public execute = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response<any, Record<string, any>>> => {
     const taskName = req.body.title;
+
+    if (typeof taskName !== "string") {
+      return res.status(400).json({ error: "Title must be a string" });
+    }
+  
     try {
       const existingTask = await prisma.task.findFirst({
         where: {
