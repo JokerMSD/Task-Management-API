@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../database/database";
 import { CreateTask } from "../interfaces/interfaces";
+import { AppError } from "../errors/AppError";
 
 export class TaskService {
   public async getTasks(req: Request, res: Response): Promise<Response> {
@@ -110,7 +111,7 @@ export class TaskService {
         where: { id: taskId },
       });
       if (!existingTask) {
-        return res.status(404).json({ message: "Task not found" });
+        throw new AppError(404, "Task not found" );
       }
 
       if (updatedTaskData.categoryId) {
