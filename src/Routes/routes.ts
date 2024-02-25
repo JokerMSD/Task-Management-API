@@ -1,4 +1,4 @@
-import { TaskController } from "../services/TaskServices";
+import { TaskController } from "../controllers/TaskController";
 import { CategoryController } from "../services/CategoryServices";
 import { Router } from "express";
 import { CheckDuplicateTaskName, GlobalErrors } from "../middlewares/middleware";
