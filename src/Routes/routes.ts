@@ -1,5 +1,5 @@
 import { TaskController } from "../controllers/TaskController";
-import { CategoryController } from "../services/CategoryServices";
+import { CategoryController } from "../controllers/CategoryControllers";
 import { Router } from "express";
 import { CheckDuplicateTaskName, GlobalErrors } from "../middlewares/middleware";
 import { taskCreateSchema, taskUpdateSchema, categoryCreateSchema } from "../schemas/task.schemas";
