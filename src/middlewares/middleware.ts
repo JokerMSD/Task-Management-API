@@ -148,10 +148,10 @@ export class CheckTaskExistence extends Service {
         throw new AppError(404, "Task not found.");
       }
 
-      res.locals.task = task; // Pass the task to the next middleware
+      res.locals.task = task;
       return next();
     } catch (error) {
-      next(error); // Pass the error to the error handling middleware
+      next(error); 
     }
   }
 }
