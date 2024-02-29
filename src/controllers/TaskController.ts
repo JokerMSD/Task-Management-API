@@ -14,28 +14,25 @@ export class TaskController {
 
   public getTaskById = async (
     req: Request,
-    res: Response
+    res: Response,
   ): Promise<Response> => {
     return this.taskService.getTaskById(req, res);
   };
 
-  public createTask = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
+  public createTask = async ( req: Request, res: Response): Promise<Response> => {
     return this.taskService.createTask(req, res);
   };
 
   public updateTask = async (
     req: Request,
-    res: Response
+    res: Response,
   ): Promise<Response> => {
     return this.taskService.updateTask(req, res);
   };
 
   public deleteTask = async (
     req: Request,
-    res: Response
+    res: Response,
   ): Promise<Response> => {
     return this.taskService.deleteTask(req, res);
   };
