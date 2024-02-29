@@ -21,16 +21,6 @@ export class UserService {
 
       const matchingUsers = await prisma.user.findMany({
         where: whereClause,
-        include: {
-          tasks: {
-            where: {
-              category: {
-                name: { equals: categoryNameFilter, mode: "insensitive" },
-              },
-            },
-            include: { category: true },
-          },
-        },
       });
 
       if (matchingUsers.length === 0) {
@@ -43,7 +33,6 @@ export class UserService {
           name: user.name,
           email: user.email,
           password: user.password,
-          task: user.tasks,
         };
       });
 
@@ -59,7 +48,6 @@ export class UserService {
       const userId = Number(req.params.id);
       const matchingUser = await prisma.user.findUnique({
         where: { id: userId },
-        include: { tasks: true },
       });
 
       if (!matchingUser) {
@@ -71,7 +59,6 @@ export class UserService {
         name: matchingUser.name,
         email: matchingUser.email,
         password: matchingUser.password,
-        taskId: matchingUser.taskId,
       };
 
       return res.status(200).json(response);
@@ -94,7 +81,7 @@ export class UserService {
       return res.status(201).json(createdUser);
     } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-        return res.status(400).json({ message: "email already registered" });
+        return res.status(400).json({ message: "This email is already registered" });
       } else {
         console.error("Error creating user:", error);
         return res
