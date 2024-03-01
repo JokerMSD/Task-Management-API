@@ -1,18 +1,13 @@
 import { z } from "zod";
+import { userSchema } from "./user.schema";
 
 const categorySchema = z.object({
     id: z.bigint().positive().transform((id) => id.toLocaleString()),
     name: z.string().min(3),
-    ownerId: z.number().optional(),
+    owner: userSchema,
 });
 
-const categoryCreateSchema = categorySchema.pick({
-    name: true,
-    ownerId: true,
-});
+const categoryCreateSchema = categorySchema.omit({id:true, owner: true}).extend({ownerId: z.number().positive()});
 
-export {
-    categorySchema,
-    categoryCreateSchema,
-  };
+export { categorySchema, categoryCreateSchema };
   
