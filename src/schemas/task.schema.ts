@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { userSchema } from "./user.schema";
+import { categorySchema } from "./category.schema";
+
 
 const taskSchema = z.object({
   id: z.bigint().positive().transform((id) => id.toLocaleString()),
@@ -6,19 +9,13 @@ const taskSchema = z.object({
   content: z.string().min(3),
   finished: z.boolean().optional().default(false),
   categoryId: z.number(),
-  ownerId: z.number().optional(),
-  category: z.object({}),
+  owner: userSchema,
+  category: categorySchema,
 });
 
-const taskCreateSchema = taskSchema.pick({
-  title: true,
-  content: true,
-  finished: true,
-  categoryId: true,
-  ownerId: true,
-});
+const taskCreateSchema = taskSchema.omit({id:true, owner: true, category: true}).extend({ownerId: z.number().positive()});
 
-const taskUpdateSchema = taskCreateSchema.partial();
+const taskUpdateSchema = taskCreateSchema.omit({ownerId: true}).partial();
 
 const taskArraySchema = taskSchema.array();
 
@@ -28,3 +25,5 @@ export {
   taskUpdateSchema,
   taskArraySchema,
 };
+
+
