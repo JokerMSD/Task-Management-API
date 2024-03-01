@@ -1,6 +1,6 @@
 import { AnyZodObject, z } from "zod";
 import { Request, Response, NextFunction } from "express";
-import { taskUpdateSchema } from "../schemas/task.schemas";
+import { taskUpdateSchema } from "../schemas/task.schema";
 import { Task, Category, User } from "@prisma/client";
 
 type CreateTask = Omit<Task, "id" | "category"> & { categoryId: number };
@@ -25,4 +25,11 @@ export interface ServiceInterface {
   ): Promise<void | Response<any, Record<string, any>>>;
 }
 
-export { Task, CreateTask, UpdateTask, CreateCategory, CreateUser, RequestSchema };
+export {
+  Task,
+  CreateTask,
+  UpdateTask,
+  CreateCategory,
+  CreateUser,
+  RequestSchema,
+};
