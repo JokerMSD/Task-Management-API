@@ -12,13 +12,20 @@ class AppError extends Error {
 }
 
 export class CategoryService {
-  public async getCategories(
-    req: Request,
-    res: Response
-  ): Promise<Response> {
+  public async getCategories( req: Request, res: Response ): Promise<Response> {
     try {
-      const categories = await prisma.category.findMany();
-      return res.status(200).json(categories);
+
+      const categories = await prisma.category.findMany({ include: { owner: true } });
+
+      const response = categories.map((user) => {
+        return {
+          id: user.id,
+          name: user.name,
+          owner: user.owner,
+        };
+      });
+
+      return res.status(200).json(response);
     } catch (error) {
       console.error("Error fetching categories:", error);
       throw new AppError(500, "Internal server error" );
