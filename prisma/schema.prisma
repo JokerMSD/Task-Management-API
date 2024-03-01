@@ -21,7 +21,7 @@ model Task {
   title      String
   content    String
   finished   Boolean   @default(false)
-  categoryId Int?      @unique
+  categoryId Int
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   ownerId    Int
   owner      User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -32,5 +32,5 @@ model Category {
   name    String
   ownerId Int
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  tasks   Task?
+  tasks   Task[]
 }
