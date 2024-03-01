@@ -6,21 +6,12 @@ import { AppError } from "../errors/AppError";
 export class UserService {
   public async getUsers(req: Request, res: Response): Promise<Response> {
     try {
-      const categoryNameFilter = req.query.category
-        ? String(req.query.category).toLowerCase()
-        : undefined;
 
       let whereClause = {};
-      if (categoryNameFilter) {
-        whereClause = {
-          category: {
-            name: { equals: categoryNameFilter, mode: "insensitive" },
-          },
-        };
-      }
 
       const matchingUsers = await prisma.user.findMany({
         where: whereClause,
+        include: { task: true },
       });
 
       if (matchingUsers.length === 0) {
@@ -33,6 +24,7 @@ export class UserService {
           name: user.name,
           email: user.email,
           password: user.password,
+          tasks: user.task,
         };
       });
 
@@ -48,6 +40,7 @@ export class UserService {
       const userId = Number(req.params.id);
       const matchingUser = await prisma.user.findUnique({
         where: { id: userId },
+        include: { task: true },
       });
 
       if (!matchingUser) {
@@ -59,6 +52,7 @@ export class UserService {
         name: matchingUser.name,
         email: matchingUser.email,
         password: matchingUser.password,
+        tasks: matchingUser.task,
       };
 
       return res.status(200).json(response);
