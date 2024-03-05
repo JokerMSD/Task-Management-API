@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { hash } from "bcryptjs";
 import { prisma } from "../database/database";
-import { CreateUser } from "../interfaces/interfaces";
 import { AppError } from "../errors/AppError";
+import { CreateUser } from "../interfaces/interfaces";
+import { Request, Response } from "express";
 
 export class UserService {
   public async getUsers(req: Request, res: Response): Promise<Response> {
@@ -65,6 +66,8 @@ export class UserService {
   public async createUser(req: Request, res: Response): Promise<Response> {
     try {
       const newUser: CreateUser = req.body;
+
+      newUser.password = await hash(newUser.password, 10);
 
       if (typeof req.body.name !== "string") {
         return res.status(400).json({ error: "Name must be a string" });
