@@ -1,56 +1,43 @@
 import { Router } from "express";
-import { TaskController } from "../controllers/TaskController";
 import { CategoryController } from "../controllers/CategoryControllers";
+import { categoryCreateSchema } from "../schemas/Index.schemas";
+import { SessionController } from "../controllers/SessionControllers";
+import { sessionCreateSchema } from "../schemas/session.schema";
+import { TaskController } from "../controllers/TaskController";
+import { taskCreateSchema, taskUpdateSchema } from "../schemas/Index.schemas";
+import { CheckDuplicateTaskName, GlobalErrors } from "../middlewares/middleware";
 import { UserController } from "../controllers/UserController";
-import {
-  CheckDuplicateTaskName,
-  GlobalErrors,
-} from "../middlewares/middleware";
-import {
-  taskCreateSchema,
-  taskUpdateSchema,
-  categoryCreateSchema,
-  userCreateSchema,
-} from "../schemas/Index.schemas";
+import { userCreateSchema } from "../schemas/Index.schemas";
 
-const router = Router();
+
+
+const appRouter = Router();
 const globalErrors = new GlobalErrors();
-const taskController = new TaskController();
 const categoryController = new CategoryController();
 const userController = new UserController();
+const taskController = new TaskController();
+const sessionController = new SessionController();
 
-router.post(
-  "/users",
-  globalErrors.validateBody(userCreateSchema),
-  userController.createUser,
-);
-router.get("/users/profile", userController.getUsers);
-router.get("/users/:id", userController.getUserById);
-router.patch("/users/:id", userController.updateUser);
-router.delete("/users/:id", userController.deleteUser);
 
-router.post(
-  "/tasks",
-  CheckDuplicateTaskName.getInstance().execute,
-  globalErrors.validateTitle,
-  globalErrors.validateBody(taskCreateSchema),
-  taskController.createTask,
-);
-router.get("/tasks", taskController.getTasks);
-router.get("/tasks/:id", taskController.getTaskById);
-router.patch(
-  "/tasks/:id",
-  globalErrors.validateBody(taskUpdateSchema),
-  taskController.updateTask,
-);
-router.delete("/tasks/:id", taskController.deleteTask);
 
-router.get("/categories", categoryController.getCategories);
-router.post(
-  "/categories",
-  globalErrors.validateBody(categoryCreateSchema),
-  categoryController.createCategory,
-);
-router.delete("/categories/:id", categoryController.deleteCategory);
+appRouter.post("/users", globalErrors.validateBody(userCreateSchema), userController.createUser);
+appRouter.get("/users/profile", userController.getUsers);
+appRouter.delete("/users/:id", userController.deleteUser);
 
-export default router;
+
+appRouter.post("/tasks", CheckDuplicateTaskName.getInstance().execute, globalErrors.validateTitle, globalErrors.validateBody(taskCreateSchema), taskController.createTask);
+appRouter.get("/tasks", taskController.getTasks);
+appRouter.get("/tasks/:id", taskController.getTaskById);
+appRouter.patch( "/tasks/:id", globalErrors.validateBody(taskUpdateSchema), taskController.updateTask);
+appRouter.delete("/tasks/:id", taskController.deleteTask);
+
+
+appRouter.get("/categories", categoryController.getCategories);
+appRouter.post( "/categories", globalErrors.validateBody(categoryCreateSchema), categoryController.createCategory);
+appRouter.delete("/categories/:id", categoryController.deleteCategory);
+
+
+appRouter.post("/users/login", globalErrors.validateBody(sessionCreateSchema), sessionController.login);
+
+
+export { appRouter };
