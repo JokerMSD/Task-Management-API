@@ -33,14 +33,14 @@ export class GlobalErrors {
   };
 
   validateTitle(req: Request, res: Response, next: NextFunction) {
-  const { title } = req.body;
+    const { title } = req.body;
 
-  if (typeof title === 'number') {
-    return res.status(400).json({ error: 'Title cannot be a number' });
+    if (typeof title === "number") {
+      return res.status(400).json({ error: "Title cannot be a number" });
+    }
+
+    next();
   }
-
-  next();
-}
 
   validateBody = (schema: AnyZodObject) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -79,14 +79,14 @@ export class CheckDuplicateTaskName extends Service {
   public execute = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void | Response<any, Record<string, any>>> => {
     const taskName = req.body.title;
 
     if (typeof taskName !== "string") {
       return res.status(400).json({ error: "Title must be a string" });
     }
-  
+
     try {
       const existingTask = await prisma.task.findFirst({
         where: {
@@ -102,7 +102,7 @@ export class CheckDuplicateTaskName extends Service {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   static getInstance(): CheckDuplicateTaskName {
     return new CheckDuplicateTaskName();
@@ -151,7 +151,17 @@ export class CheckTaskExistence extends Service {
       res.locals.task = task;
       return next();
     } catch (error) {
-      next(error); 
+      next(error);
     }
   }
+}
+
+export class AuthMiddleware {
+  public isAuthenticated = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void => {
+    return next();
+  };
 }
