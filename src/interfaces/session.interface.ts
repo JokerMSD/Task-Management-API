@@ -3,7 +3,7 @@ import { sessionCreateSchema } from "../schemas/session.schema";
 
 type SessionCreate = z.infer<typeof sessionCreateSchema>;
 type SessionReturn = {
-  token: string;
+  accessToken: string;
 };
 
 export { SessionCreate, SessionReturn };
