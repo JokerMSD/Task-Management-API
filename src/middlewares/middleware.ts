@@ -5,6 +5,7 @@ import { AppError } from "../errors/AppError";
 import { AnyZodObject, ZodError, ZodIssueCode } from "zod";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
+import { JsonWebTokenError, verify } from "jsonwebtoken";
 
 export abstract class Service implements ServiceInterface {
   abstract execute(
@@ -27,6 +28,10 @@ export class GlobalErrors {
 
     if (err instanceof ZodError) {
       return res.status(400).json(err);
+    }
+
+    if (err instanceof JsonWebTokenError) {
+      return res.status(401).json({ message: err.message });
     }
 
     return res.status(500).json({ error: "Internal server error" });
@@ -162,6 +167,20 @@ export class AuthMiddleware {
     res: Response,
     next: NextFunction,
   ): void => {
+    const { authorization } = req.headers;
+    if (!authorization) {
+      throw new AppError(401, "Unauthorized");
+    }
+
+    const [_bearer, token] = authorization.split(" ");
+
+    const secret = process.env.SECRET_KEY!
+
+    res.locals = {
+      ...res.locals,
+      decoded: verify(token, secret)
+    }
+
     return next();
   };
 }
