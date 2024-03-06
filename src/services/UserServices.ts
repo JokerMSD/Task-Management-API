@@ -78,7 +78,7 @@ export class UserService {
       return res.status(201).json(createdUser);
     } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-        return res.status(400).json({ message: "This email is already registered" });
+        return res.status(409).json({ message: "This email is already registered" });
       } else {
         console.error("Error creating user:", error);
         return res
