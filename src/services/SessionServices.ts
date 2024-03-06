@@ -11,12 +11,12 @@ export class SessionService {
   }: SessionCreate): Promise<SessionReturn> => {
     const foundUser = await prisma.user.findFirst({ where: { email } });
     if (!foundUser) {
-      throw new AppError(401, "Invalid credentials");
+      throw new AppError(404, "User not exists");
     }
 
     const pwdMatch = await compare(password, foundUser.password);
     if (!pwdMatch) {
-      throw new AppError(401, "Invalid credentials");
+      throw new AppError(401, "Email and password doesn't match");
     }
 
     const secret = process.env.SECRET_KEY!;
@@ -27,6 +27,13 @@ export class SessionService {
       subject: String(foundUser.id),
     });
 
-    return { accessToken };
+    return {
+      accessToken,
+      user: {
+        id: foundUser.id,
+        name: foundUser.name,
+        email: foundUser.email,
+      },
+    };
   };
 }
