@@ -5,7 +5,7 @@ import { SessionController } from "../controllers/SessionControllers";
 import { sessionCreateSchema } from "../schemas/session.schema";
 import { TaskController } from "../controllers/TaskController";
 import { taskCreateSchema, taskUpdateSchema } from "../schemas/Index.schemas";
-import { CheckDuplicateTaskName, GlobalErrors } from "../middlewares/middleware";
+import { CheckDuplicateTaskName, GlobalErrors, AuthMiddleware } from "../middlewares/middleware";
 import { UserController } from "../controllers/UserController";
 import { userCreateSchema } from "../schemas/Index.schemas";
 
@@ -17,11 +17,12 @@ const categoryController = new CategoryController();
 const userController = new UserController();
 const taskController = new TaskController();
 const sessionController = new SessionController();
+const auth = new AuthMiddleware();
 
 
 
 appRouter.post("/users", globalErrors.validateBody(userCreateSchema), userController.createUser);
-appRouter.get("/users/profile", userController.getUsers);
+appRouter.get("/users/profile", auth.isAuthenticated, userController.getUsers);
 appRouter.delete("/users/:id", userController.deleteUser);
 
 
