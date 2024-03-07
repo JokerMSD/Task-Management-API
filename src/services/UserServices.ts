@@ -7,7 +7,6 @@ import { Request, Response } from "express";
 export class UserService {
   public async getUsers(req: Request, res: Response): Promise<Response> {
     try {
-
       let whereClause = {};
 
       const matchingUsers = await prisma.user.findMany({
@@ -24,7 +23,6 @@ export class UserService {
           id: user.id,
           name: user.name,
           email: user.email,
-          password: user.password,
           tasks: user.task,
         };
       });
@@ -52,7 +50,6 @@ export class UserService {
         id: matchingUser.id,
         name: matchingUser.name,
         email: matchingUser.email,
-        password: matchingUser.password,
         tasks: matchingUser.task,
       };
 
@@ -78,7 +75,9 @@ export class UserService {
       return res.status(201).json(createdUser);
     } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-        return res.status(409).json({ message: "This email is already registered" });
+        return res
+          .status(409)
+          .json({ message: "This email is already registered" });
       } else {
         console.error("Error creating user:", error);
         return res
