@@ -1,7 +1,7 @@
 import "express-async-errors";
 import cors from "cors";
 import helmet from "helmet";
-import { GlobalErrors } from "./middlewares/middleware";
+import { GlobalErrors } from "./middlewares/index.middleware";
 import { appRouter } from "./Routes/routes";
 import express, { json } from "express";
 
