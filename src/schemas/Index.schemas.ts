@@ -1,5 +1,5 @@
 import { categorySchema, categoryCreateSchema } from "./category.schema";
-import { userSchema, userCreateSchema } from "./user.schema";
+import { userSchema, userCreateSchema, userReturnSchema } from "./user.schema";
 import {
   taskSchema,
   taskCreateSchema,
@@ -8,12 +8,13 @@ import {
 } from "./task.schema";
 
 export {
-  categorySchema,
-  categoryCreateSchema,
   userSchema,
-  userCreateSchema,
   taskSchema,
+  categorySchema,
+  taskArraySchema,
+  userCreateSchema,
+  userReturnSchema,
   taskCreateSchema,
   taskUpdateSchema,
-  taskArraySchema,
+  categoryCreateSchema,
 };
