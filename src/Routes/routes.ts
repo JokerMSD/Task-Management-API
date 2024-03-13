@@ -13,10 +13,10 @@ import { CheckDuplicateTaskName, GlobalErrors, AuthMiddleware, PermissionMiddlew
 
 const appRouter = Router();
 const auth = new AuthMiddleware();
-const admin = new PermissionMiddleware()
 const globalErrors = new GlobalErrors();
 const userController = new UserController();
 const taskController = new TaskController();
+const permission = new PermissionMiddleware()
 const sessionController = new SessionController();
 const categoryController = new CategoryController();
 
@@ -24,19 +24,19 @@ const categoryController = new CategoryController();
 
 appRouter.post("/users", globalErrors.validateBody(userCreateSchema), userController.createUser);
 appRouter.get("/users/profile", auth.isAuthenticated, userController.getUsers);
-appRouter.delete("/users/:id", auth.isAuthenticated, admin.isAdminOrOwnerUser, userController.deleteUser);
+appRouter.delete("/users/:id", auth.isAuthenticated, permission.isAdminOrOwnerUser, userController.deleteUser);
 
 
 appRouter.post("/tasks", auth.isAuthenticated, CheckDuplicateTaskName.getInstance().execute, globalErrors.validateTitle, globalErrors.validateBody(taskCreateSchema), taskController.createTask);
 appRouter.get("/tasks", auth.isAuthenticated, taskController.getTasks);
 appRouter.get("/tasks/:id", auth.isAuthenticated, taskController.getTaskById);
-appRouter.patch( "/tasks/:id", auth.isAuthenticated, globalErrors.validateBody(taskUpdateSchema), taskController.updateTask);
-appRouter.delete("/tasks/:id", auth.isAuthenticated, taskController.deleteTask);
+appRouter.patch( "/tasks/:id", auth.isAuthenticated, permission.isAdminOrOwnerUser, globalErrors.validateBody(taskUpdateSchema), taskController.updateTask);
+appRouter.delete("/tasks/:id", auth.isAuthenticated, permission.isAdminOrOwnerUser, taskController.deleteTask);
 
 
 appRouter.get("/categories", auth.isAuthenticated, categoryController.getCategories);
 appRouter.post( "/categories", auth.isAuthenticated, globalErrors.validateBody(categoryCreateSchema), categoryController.createCategory);
-appRouter.delete("/categories/:id", auth.isAuthenticated, categoryController.deleteCategory);
+appRouter.delete("/categories/:id", auth.isAuthenticated, permission.isAdminOrOwnerUser, categoryController.deleteCategory);
 
 
 appRouter.post("/users/login", globalErrors.validateBody(sessionCreateSchema), sessionController.login);
