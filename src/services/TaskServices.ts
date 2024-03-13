@@ -1,38 +1,95 @@
-import { Request, Response } from "express";
 import { prisma } from "../database/database";
 import { CreateTask } from "../interfaces/interfaces";
-import { AppError } from "../errors/AppError";
+import { Request, Response, request } from "express";
 
 export class TaskService {
-  public async createTask( req: Request, res: Response ): Promise<Response> {
+  public async createTask(req: Request, res: Response): Promise<Response> {
     try {
+      const userId = Number(res.locals.userId);
       const newTask: CreateTask = req.body;
+
+      const url = "http://localhost:3000/categories";
+      const token = res.locals.actualToken;
+      const data = { name: "Without Category" };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("An error occurred while creating category");
+      }
 
       if (typeof req.body.title !== "string") {
         return res.status(400).json({ error: "Title must be a string" });
       }
 
-      const category = await prisma.category.findUnique({
-        where: { id: newTask.categoryId },
+      let category = await prisma.category.findFirst({
+        where: {
+          id:
+            newTask.categoryId !== null
+              ? { equals: newTask.categoryId }
+              : undefined,
+        },
       });
+
       if (!category) {
         return res.status(404).json({ message: "Category not found" });
       }
 
-      const createdTask = await prisma.task.create({ data: newTask, include: { owner: true } });
+      if (!category) {
+        const url = "http://localhost:3000/categories";
+        const token = res.locals.actualToken;
+        const data = { name: "Without Category" };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error("An error occurred while creating category");
+        }
+
+        const fetchedCategory: any = await response.json();
+        category = {
+          id: Number(fetchedCategory.id),
+          name: fetchedCategory.name,
+          userId: fetchedCategory.userId,
+        };
+      }
+
+      const taskData: any = {
+        title: newTask.title,
+        content: newTask.content,
+        finished: newTask.finished,
+        categoryId: category.id,
+        userId: userId,
+      };
+
+      const createdTask = await prisma.task.create({
+        data: taskData,
+        include: { owner: true },
+      });
 
       return res.status(201).json(createdTask);
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error creating task:", error);
-      } else {
-        console.error("An unexpected error occurred:", error);
-      }
+      console.error("Error creating task:", error);
       return res
         .status(500)
         .json({ message: "An error occurred while creating the task" });
     }
   }
+
   public async getTasks(req: Request, res: Response): Promise<Response> {
     try {
       const categoryNameFilter = req.query.category
@@ -40,11 +97,17 @@ export class TaskService {
         : undefined;
 
       let whereClause = {};
+      const ownerId = Number(res.locals.userId);
       if (categoryNameFilter) {
         whereClause = {
+          userId: ownerId,
           category: {
             name: { equals: categoryNameFilter, mode: "insensitive" },
           },
+        };
+      } else {
+        whereClause = {
+          userId: ownerId,
         };
       }
 
@@ -52,7 +115,6 @@ export class TaskService {
         where: whereClause,
         include: { category: true, owner: true },
       });
-
 
       if (matchingTasks.length === 0) {
         return res.status(404).json({ message: "No tasks found" });
@@ -107,13 +169,23 @@ export class TaskService {
   public async updateTask(req: Request, res: Response): Promise<Response> {
     try {
       const taskId = Number(req.params.id);
+      const ownerId = Number(res.locals.userId);
+      const isAdmin = String(res.locals.decoded.sub);
       const updatedTaskData = req.body;
 
       const existingTask = await prisma.task.findUnique({
         where: { id: taskId },
       });
       if (!existingTask) {
-        throw new AppError(404, "Task not found");
+        return res.status(404).json({ message: "Task not found" });
+      }
+
+      if (isAdmin != "true") {
+        if (existingTask.userId != ownerId) {
+          return res
+            .status(403)
+            .json({ message: "You are not the owner of this task" });
+        }
       }
 
       if (updatedTaskData.categoryId) {
@@ -139,6 +211,8 @@ export class TaskService {
 
   public async deleteTask(req: Request, res: Response): Promise<Response> {
     try {
+      const ownerId = Number(res.locals.userId);
+      const isAdmin = String(res.locals.decoded.sub);
       const taskId = Number(req.params.id);
 
       const existingTask = await prisma.task.findUnique({
@@ -147,6 +221,14 @@ export class TaskService {
 
       if (!existingTask) {
         return res.status(404).json({ message: "Task not found" });
+      }
+
+      if (isAdmin != "true") {
+        if (existingTask.userId != ownerId) {
+          return res
+            .status(403)
+            .json({ message: "You are not the owner of this task" });
+        }
       }
 
       await prisma.task.delete({ where: { id: taskId } });
