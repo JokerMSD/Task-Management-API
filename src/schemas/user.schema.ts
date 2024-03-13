@@ -5,7 +5,7 @@ const userSchema = z.object({
   name: z.string().min(3).max(255),
   email: z.string().email().max(255),
   password: z.string().max(16),
-  admin: z.boolean().default(false),
+  isAdmin: z.boolean().default(false),
 });
 
 const userCreateSchema = userSchema.omit({ id: true });
