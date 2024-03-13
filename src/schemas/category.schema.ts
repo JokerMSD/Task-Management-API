@@ -7,7 +7,7 @@ const categorySchema = z.object({
     owner: userSchema,
 });
 
-const categoryCreateSchema = categorySchema.omit({id:true, owner: true}).extend({ownerId: z.number().positive()});
+const categoryCreateSchema = categorySchema.omit({id:true, owner: true}).extend({ userId: z.number().positive().nullish() });
 
 export { categorySchema, categoryCreateSchema };
   
