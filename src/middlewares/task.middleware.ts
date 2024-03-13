@@ -12,6 +12,7 @@ export class CheckDuplicateTaskName extends Service {
     next: NextFunction,
   ): Promise<void | Response<any, Record<string, any>>> => {
     const taskName = req.body.title;
+    const ownerId = Number(res.locals.userId);
 
     if (typeof taskName !== "string") {
       return res.status(400).json({ error: "Title must be a string" });
@@ -21,6 +22,7 @@ export class CheckDuplicateTaskName extends Service {
       const existingTask = await prisma.task.findFirst({
         where: {
           title: taskName,
+          userId: ownerId,
         },
       });
 
