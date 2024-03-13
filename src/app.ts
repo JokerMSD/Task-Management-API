@@ -11,6 +11,6 @@ app.use(json());
 app.use(cors());
 const globalErrors = new GlobalErrors();
 
-app.use( appRouter );
+app.use(appRouter);
 
 app.use(globalErrors.handleErrors);
