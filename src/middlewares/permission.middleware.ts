@@ -18,22 +18,29 @@ export class AuthMiddleware {
 
     const secret = process.env.SECRET_KEY!;
 
-    res.locals = {
-      ...res.locals,
-      decoded: verify(token, secret),
-    };
+    res.locals = { ...res.locals, decoded: verify(token, secret) };
+
+    const decodedToken: any = verify(token, secret);
+
+    res.locals.userId = decodedToken.id;
+
+    res.locals.actualToken = token;
 
     return next();
   };
 }
 
-
 export class PermissionMiddleware {
+  public isAdminOrOwnerUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    const userTokenId = Number(res.locals.decoded.id);
+    const userId = Number(res.locals.userId);
+    const isAdmin = Boolean(res.locals.decoded.sub);
 
-  public isAdminOrOwnerUser = async ( req: Request, res: Response, next: NextFunction ) : Promise<void> => {
-        
-    const userTokenId = Number(res.locals.decoded.sub);
-    const userId = Number(req.params.userId);
+    console.log(isAdmin);
 
     const userToken = await prisma.user.findFirst({
       where: { id: userTokenId },
@@ -42,11 +49,11 @@ export class PermissionMiddleware {
     if (!userToken) {
       throw new AppError(403, "Token owner not found.");
     }
-    
-    if (userToken.isAdmin || userTokenId === userId) {
-      return next()
+
+    if (userId === userTokenId || userToken.isAdmin) {
+      return next();
     }
 
-    throw new AppError(401, "Insufficient Permissions."); 
-  }
+    throw new AppError(401, "Insufficient Permissions.");
+  };
 }
