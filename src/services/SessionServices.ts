@@ -24,7 +24,7 @@ export class SessionService {
 
     const accessToken = sign({ id: foundUser.id }, secret, {
       expiresIn,
-      subject: String(foundUser.id),
+      subject: String(foundUser.isAdmin),
     });
 
     return {
