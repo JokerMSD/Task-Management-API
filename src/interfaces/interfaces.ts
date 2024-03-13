@@ -17,8 +17,7 @@ interface RequestSchema {
 }
 
 export interface ServiceInterface {
-  execute( req: Request | undefined, res: Response | undefined, next: NextFunction | undefined,
-  ): Promise<void | Response<any, Record<string, any>>>;
+  execute( req: Request | undefined, res: Response | undefined, next: NextFunction | undefined ): Promise<void | Response<any, Record<string, any>>>;
 }
 
 export {
