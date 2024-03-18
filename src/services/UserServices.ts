@@ -7,8 +7,8 @@ import { Request, Response } from "express";
 export class UserService {
   public async getUsers(req: Request, res: Response): Promise<Response> {
     try {
-      const ownerId = Number(res.locals.userId);
-      const isAdmin = String(res.locals.decoded.sub);
+      const ownerId = Number(res.locals.decoded.id);
+      const isAdmin = String(res.locals.decoded.isAdmin);
 
       if (isAdmin === "true") {
         const matchingUsers = await prisma.user.findMany({
