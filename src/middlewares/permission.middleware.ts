@@ -18,8 +18,6 @@ export class AuthMiddleware {
 
     const secret = process.env.SECRET_KEY!;
 
-    res.locals = { ...res.locals, decoded: verify(token, secret) };
-
     const decodedToken: any = verify(token, secret);
 
     res.locals.userId = decodedToken.id;
