@@ -5,7 +5,7 @@ import { Request, Response, request } from "express";
 export class TaskService {
   public async createTask(req: Request, res: Response): Promise<Response> {
     try {
-      const userId = Number(res.locals.userId);
+      const userId = Number(res.locals.decoded.id);
       const newTask: CreateTask = req.body;
 
       const url = "http://localhost:3000/categories";
@@ -97,7 +97,7 @@ export class TaskService {
         : undefined;
 
       let whereClause = {};
-      const ownerId = Number(res.locals.userId);
+      const ownerId = Number(res.locals.decoded.id);
       if (categoryNameFilter) {
         whereClause = {
           userId: ownerId,
@@ -169,8 +169,8 @@ export class TaskService {
   public async updateTask(req: Request, res: Response): Promise<Response> {
     try {
       const taskId = Number(req.params.id);
-      const ownerId = Number(res.locals.userId);
-      const isAdmin = String(res.locals.decoded.sub);
+      const ownerId = Number(res.locals.decoded.id);
+      const isAdmin = String(res.locals.decoded.isAdmin);
       const updatedTaskData = req.body;
 
       const existingTask = await prisma.task.findUnique({
@@ -211,8 +211,8 @@ export class TaskService {
 
   public async deleteTask(req: Request, res: Response): Promise<Response> {
     try {
-      const ownerId = Number(res.locals.userId);
-      const isAdmin = String(res.locals.decoded.sub);
+      const ownerId = Number(res.locals.decoded.id);
+      const isAdmin = String(res.locals.decoded.isAdmin);
       const taskId = Number(req.params.id);
 
       const existingTask = await prisma.task.findUnique({
