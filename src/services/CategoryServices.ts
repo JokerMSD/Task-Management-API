@@ -35,7 +35,7 @@ export class CategoryService {
 
   public async createCategory(req: Request, res: Response): Promise<Response> {
     try {
-      const ownerId = Number(res.locals.userId);
+      const ownerId = Number(res.locals.decoded.id);
       const newCategory: CreateCategory = req.body;
 
       const ownerExists = await prisma.user.findUnique({
@@ -63,8 +63,8 @@ export class CategoryService {
   public async deleteCategory(req: Request, res: Response): Promise<Response> {
     try {
       const categoryId = Number(req.params.id);
-      const ownerId = Number(res.locals.userId);
-      const isAdmin = String(res.locals.decoded.sub);
+      const ownerId = Number(res.locals.decoded.id);
+      const isAdmin = String(res.locals.decoded.isAdmin);
 
       const category = await prisma.category.findUnique({
         where: { id: categoryId },
