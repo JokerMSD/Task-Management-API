@@ -21,10 +21,14 @@ export class SessionService {
 
     const secret = process.env.SECRET_KEY!;
     const expiresIn = process.env.EXPIRES_IN!;
+    const payload = {
+      id: foundUser.id,
+      isAdmin: foundUser.isAdmin
+    };
 
-    const accessToken = sign({ id: foundUser.id }, secret, {
+    const accessToken = sign(payload, secret, {
       expiresIn,
-      subject: String(foundUser.isAdmin),
+      subject: String(foundUser.id),
     });
 
     return {
