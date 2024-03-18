@@ -12,7 +12,7 @@ export class CheckDuplicateTaskName extends Service {
     next: NextFunction,
   ): Promise<void | Response<any, Record<string, any>>> => {
     const taskName = req.body.title;
-    const ownerId = Number(res.locals.userId);
+    const ownerId = Number(res.locals.decoded.id);
 
     if (typeof taskName !== "string") {
       return res.status(400).json({ error: "Title must be a string" });
