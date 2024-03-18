@@ -18,11 +18,11 @@ export class AuthMiddleware {
 
     const secret = process.env.SECRET_KEY!;
 
-    const decodedToken: any = verify(token, secret);
-
-    res.locals.userId = decodedToken.id;
+    res.locals = { ...res.locals, decoded: verify(token, secret) };
 
     res.locals.actualToken = token;
+
+    console.log(res.locals);
 
     return next();
   };
@@ -35,19 +35,16 @@ export class PermissionMiddleware {
     next: NextFunction,
   ): Promise<void> => {
     const userTokenId = Number(res.locals.decoded.id);
-    const userId = Number(res.locals.userId);
-    const isAdmin = Boolean(res.locals.decoded.sub);
-
-    console.log(isAdmin);
-
+    const userId = Number(res.locals.decoded.id);
+    
     const userToken = await prisma.user.findFirst({
       where: { id: userTokenId },
     });
-
+    
     if (!userToken) {
       throw new AppError(403, "Token owner not found.");
     }
-
+    
     if (userId === userTokenId || userToken.isAdmin) {
       return next();
     }
