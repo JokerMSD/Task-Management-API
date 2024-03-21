@@ -1,15 +1,8 @@
-import { describe, it } from "vitest";
-import {
-   invalidDataTask,
-   task,
-   taskWithInvalidCategory,
-} from "../../mocks/tasks.mocks";
 import { request } from "../../setupFiles";
-import {
-   generateAuthentication,
-   generateInvalidToken,
-} from "../../utils/generateAuthentication";
+import { describe, it } from "vitest";
 import { taskDefaultExpects } from "../../utils/taskDefaultExpects";
+import { generateAuthentication, generateInvalidToken } from "../../utils/generateAuthentication";
+import { invalidDataTask, task, taskWithInvalidCategory } from "../../mocks/tasks.mocks";
 
 describe("create task", () => {
   it("should be able to create task sucessfully", async () => {
