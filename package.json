@@ -4,6 +4,7 @@
   "description": "Está documentação servirá de base para entrega, todas as rotas deverão se comportar assim como está previsto na documentação abaixo:",
   "main": "index.js",
   "scripts": {
+    "live": "clear && dotenv -e .env -- tsnd --respawn src/server.ts",
     "dev": "clear && dotenv -e .env.develop -- tsnd --respawn src/server.ts",
     "migrate:dev": "dotenv -e .env.develop -- npx prisma migrate dev",
     "test": "clear && dotenv -e .env.test -- vitest",
